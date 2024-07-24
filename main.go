@@ -76,6 +76,20 @@ func main() {
 			}
 			tasks = DeleteTask(id, tasks)
 			UpdateJson(file, tasks)
+
+		case "complete":
+			if len(os.Args) < 3 {
+				fmt.Println("Task ID is required to delete")
+				return
+			}
+
+			id, errConv := strconv.Atoi(os.Args[2])
+			if errConv != nil {
+				fmt.Println("ERROR ID must be an int: %V", errConv)
+				return
+			}
+			tasks = CompleteTask(id, tasks)
+			UpdateJson(file, tasks)
 		default:
 			fmt.Println("ERROR: unknown command")
 		}
@@ -92,6 +106,17 @@ func AddTask(task string, tasks []models.Task) []models.Task {
 		COMPLETE: false,
 	}
 	return append(tasks, newTask)
+}
+
+func CompleteTask(taskId int, tasks []models.Task) []models.Task {
+
+	for i, task := range tasks {
+		if task.ID == taskId {
+			tasks[i].COMPLETE = !task.COMPLETE
+			break
+		}
+	}
+	return tasks
 }
 
 func DeleteTask(taskId int, tasks []models.Task) []models.Task {
