@@ -61,7 +61,7 @@ func main() {
 			name = strings.TrimSpace(name)
 
 			tasks = AddTask(name, tasks)
-			
+			UpdateJson(file, tasks)
 		default:
 			fmt.Println("ERROR: unknown command")
 		}
@@ -79,7 +79,6 @@ func AddTask(task string, tasks []models.Task) []models.Task {
 	}
 	return append(tasks, newTask)
 }
-
 func GenNextId(tasks []models.Task) int {
 
 	lastId := len(tasks)
@@ -108,4 +107,34 @@ func ListTasks(tasks []models.Task) {
 
 func printUsage() {
 	fmt.Println("task-manager:[list|add|delete|complete]")
+}
+
+func UpdateJson(file *os.File, tasks []models.Task) {
+
+	bytes, err := json.Marshal(tasks)
+	if err != nil {
+		fmt.Println("ERROR marshalling data: %V", err)
+	}
+
+	_, errSeek := file.Seek(0, 0)
+	if errSeek != nil {
+		fmt.Println("ERROR seeking data: %V", errSeek)
+	}
+
+	errTruncate := file.Truncate(0)
+	if errTruncate != nil {
+		fmt.Println("ERROR truncating data: %V", errTruncate)
+	}
+
+	writer := bufio.NewWriter(file)
+	_, errWrite := writer.Write(bytes)
+	if errWrite != nil {
+		fmt.Println("ERROR writing data: %V", errWrite)
+	}
+
+	errFlush := writer.Flush()
+	if errFlush != nil {
+		fmt.Println("ERROR flushing data: %V", errFlush)
+	}
+
 }
