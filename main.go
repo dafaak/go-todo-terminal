@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	models "github.com/dafaak/go-cli-todo/tasks"
 	"io"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -51,11 +53,38 @@ func main() {
 		switch os.Args[1] {
 		case "list":
 			ListTasks(tasks)
+		case "add":
+
+			reader := bufio.NewReader(os.Stdin)
+			fmt.Println("Whats your task?")
+			name, _ := reader.ReadString('\n')
+			name = strings.TrimSpace(name)
+
+			tasks = AddTask(name, tasks)
+			
 		default:
 			fmt.Println("ERROR: unknown command")
 		}
 
 	}
+
+}
+
+func AddTask(task string, tasks []models.Task) []models.Task {
+
+	newTask := models.Task{
+		ID:       GenNextId(tasks),
+		DESC:     task,
+		COMPLETE: false,
+	}
+	return append(tasks, newTask)
+}
+
+func GenNextId(tasks []models.Task) int {
+
+	lastId := len(tasks)
+
+	return lastId + 1
 
 }
 
