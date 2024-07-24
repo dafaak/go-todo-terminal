@@ -7,6 +7,7 @@ import (
 	models "github.com/dafaak/go-cli-todo/tasks"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -62,6 +63,19 @@ func main() {
 
 			tasks = AddTask(name, tasks)
 			UpdateJson(file, tasks)
+		case "delete":
+			if len(os.Args) < 3 {
+				fmt.Println("Task ID is required to delete")
+				return
+			}
+
+			id, errConv := strconv.Atoi(os.Args[2])
+			if errConv != nil {
+				fmt.Println("ERROR ID must be an int: %V", errConv)
+				return
+			}
+			tasks = DeleteTask(id, tasks)
+			UpdateJson(file, tasks)
 		default:
 			fmt.Println("ERROR: unknown command")
 		}
@@ -79,6 +93,16 @@ func AddTask(task string, tasks []models.Task) []models.Task {
 	}
 	return append(tasks, newTask)
 }
+
+func DeleteTask(taskId int, tasks []models.Task) []models.Task {
+	for i, task := range tasks {
+		if task.ID == taskId {
+			return append(tasks[:i], tasks[i+1:]...)
+		}
+	}
+	return tasks
+}
+
 func GenNextId(tasks []models.Task) int {
 
 	lastId := len(tasks)
