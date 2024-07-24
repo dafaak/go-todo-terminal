@@ -43,4 +43,40 @@ func main() {
 		//tasks = []models.Task{}
 	}
 
+	if len(os.Args) < 2 {
+		printUsage()
+	}
+
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "list":
+			ListTasks(tasks)
+		default:
+			fmt.Println("ERROR: unknown command")
+		}
+
+	}
+
+}
+
+func ListTasks(tasks []models.Task) {
+	if len(tasks) == 0 {
+		fmt.Println("No tasks found")
+		return
+	}
+	fmt.Println("Tasks:")
+	for _, task := range tasks {
+
+		status := "🤗"
+
+		if !task.COMPLETE {
+			status = "🥲"
+		}
+
+		fmt.Printf("[%s] [%d] %s \n", status, task.ID, task.DESC)
+	}
+}
+
+func printUsage() {
+	fmt.Println("task-manager:[list|add|delete|complete]")
 }
